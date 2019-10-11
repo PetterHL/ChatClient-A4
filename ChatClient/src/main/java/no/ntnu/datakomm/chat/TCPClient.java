@@ -9,7 +9,6 @@ public class TCPClient {
     private PrintWriter toServer;
     private BufferedReader fromServer;
     private Socket connection;
-    private Socket socket;
 
     // Hint: if you want to store a message for the last error, store it here
     private String lastError = null;
@@ -27,19 +26,20 @@ public class TCPClient {
         // TODO Step 1: implement this method
         // Hint: Remember to process all exceptions and return false on error
         // Hint: Remember to set up all the necessary input/output stream variables
-        socket = new Socket();
-        InetSocketAddress serverAddress = new InetSocketAddress(host, port);
+
+        boolean isConnected = false;
 
         try {
-            socket.connect(serverAddress);
-
-            System.out.println("Successful connection! ");
+            this.connection = new Socket(host, port);
+            this.toServer =  new PrintWriter(connection.getOutputStream(), true);
+            InputStreamReader in = new InputStreamReader(connection.getInputStream());
+            fromServer = new BufferedReader(in);
+            isConnected = true;
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Socket Error: " +  e.getMessage());
-            return false;
         }
-        return this.socket.isConnected();
+        return isConnected;
     }
 
     /**
@@ -72,7 +72,7 @@ public class TCPClient {
     private boolean sendCommand(String cmd) {
         // TODO Step 2: Implement this method
         // Hint: Remember to check if connection is active
-        return false;
+      return false;
     }
 
     /**
