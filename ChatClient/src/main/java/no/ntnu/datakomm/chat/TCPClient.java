@@ -73,17 +73,9 @@ public class TCPClient {
         // TODO Step 2: Implement this method
         // Hint: Remember to check if connection is active
         boolean cmdSent = false;
-        if (isConnectionActive()){
-            try {
-                OutputStream out = connection.getOutputStream();
-                PrintWriter writer = new PrintWriter(out, true);
-                writer.println(cmd);
-                out.write(cmd.getBytes());
+        if (this.isConnectionActive()){
+                toServer.println(cmd);
                 cmdSent = true;
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("ERROR: Failed to send message " + e.getMessage());
-            }
         }
       return cmdSent;
     }
@@ -98,7 +90,8 @@ public class TCPClient {
         // TODO Step 2: implement this method
         // Hint: Reuse sendCommand() method
         // Hint: update lastError if you want to store the reason for the error.
-        return false;
+        return this.sendCommand("Public message " + message);
+
     }
 
     /**
