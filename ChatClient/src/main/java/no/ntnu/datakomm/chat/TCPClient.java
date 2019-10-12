@@ -31,7 +31,7 @@ public class TCPClient {
 
         try {
             this.connection = new Socket(host, port);
-            this.toServer =  new PrintWriter(connection.getOutputStream(), true);
+            toServer =  new PrintWriter(connection.getOutputStream(), true);
             InputStreamReader in = new InputStreamReader(connection.getInputStream());
             fromServer = new BufferedReader(in);
             isConnected = true;
@@ -72,7 +72,20 @@ public class TCPClient {
     private boolean sendCommand(String cmd) {
         // TODO Step 2: Implement this method
         // Hint: Remember to check if connection is active
-      return false;
+        boolean cmdSent = false;
+        if (isConnectionActive()){
+            try {
+                OutputStream out = connection.getOutputStream();
+                PrintWriter writer = new PrintWriter(out, true);
+                writer.println(cmd);
+                out.write(cmd.getBytes());
+                cmdSent = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("ERROR: Failed to send message " + e.getMessage());
+            }
+        }
+      return cmdSent;
     }
 
     /**
