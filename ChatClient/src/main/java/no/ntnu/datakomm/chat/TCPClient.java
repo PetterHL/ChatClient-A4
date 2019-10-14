@@ -138,7 +138,8 @@ public class TCPClient {
         // TODO Step 6: Implement this method
         // Hint: Reuse sendCommand() method
         // Hint: update lastError if you want to store the reason for the error.
-        return false;
+        String command = "privmsg " + recipient + " " + message;
+        return this.sendCommand(command);
     }
 
 
@@ -195,6 +196,8 @@ public class TCPClient {
         t.start();
     }
 
+
+
     /**
      * Read incoming messages one by one, generate events for the listeners. A loop that runs until
      * the connection is closed.
@@ -223,31 +226,27 @@ public class TCPClient {
                 // TODO Step 5: update this method, handle user-list response from the server
                 // Hint: In Step 5 reuse onUserList() method
                 case "users":
-                    
+                    onUsersList(responsePart.split(" "));
                     break;
 
                 case "msg":
-
+                    onMsgReceived(false, commandPart, responsePart);
                     break;
 
                 case "privmsg":
-
+                    onMsgReceived(true,commandPart,responsePart);
                     break;
 
                 case "msgerr":
-
+                    onMsgError(responsePart);
                     break;
 
                 case "cmderr":
-
-                    break;
-
-                case "help":
-
+                    onCmdError(responsePart);
                     break;
 
                 case "supported":
-
+                    onSupported(responsePart.split(" "));
                     break;
             }
 
@@ -335,6 +334,10 @@ public class TCPClient {
      */
     private void onMsgReceived(boolean priv, String sender, String text) {
         // TODO Step 7: Implement this method
+        TextMessage textMessage = new TextMessage(sender, priv, text);
+        for (ChatListener chatListener : listeners) {
+            chatListener.onMessageReceived(textMessage);
+        }
     }
 
     /**
@@ -344,6 +347,10 @@ public class TCPClient {
      */
     private void onMsgError(String errMsg) {
         // TODO Step 7: Implement this method
+        for (ChatListener chatListener : listeners) {
+            chatListener.onMessageError(errMsg);
+        }
+        this.setLastError(errMsg);
     }
 
     /**
@@ -353,6 +360,11 @@ public class TCPClient {
      */
     private void onCmdError(String errMsg) {
         // TODO Step 7: Implement this method
+
+        for (ChatListener chatListener : listeners) {
+            chatListener.onCommandError(errMsg);
+        }
+        this.setLastError(errMsg);
     }
 
     /**
@@ -363,5 +375,14 @@ public class TCPClient {
      */
     private void onSupported(String[] commands) {
         // TODO Step 8: Implement this method
+
+        for (ChatListener chatListener : listeners) {
+            chatListener.onSupportedCommands(commands);
+        }
+
     }
+    public void setLastError(String lastError) {
+        this.lastError = lastError;
+    }
+
 }
